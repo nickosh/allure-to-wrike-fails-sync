@@ -1,5 +1,6 @@
+from argparse import ArgumentParser
 from logging import Logger, StreamHandler
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 from urllib.parse import quote
 
 import requests
@@ -83,7 +84,18 @@ def create_wrike_task(folder_id: str, task_title: str, task_desc: str) -> bool:
 
 
 def main() -> None:
-    allure_url: str = config("ALLURE_REPORT_URL")
+    parser: ArgumentParser = ArgumentParser(
+        description="Parse Allure report and create tasks for QA"
+    )
+    parser.add_argument(
+        "allure_report_url",
+        metavar="allure_report_url",
+        type=str,
+        help="URL of Allure's report",
+    )
+    args: Optional[str] = parser.parse_args()
+
+    allure_url: str = args.allure_report_url
     if not allure_url:
         raise EnvironmentError("Allure report url not provided!")
 
