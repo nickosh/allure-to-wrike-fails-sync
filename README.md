@@ -27,7 +27,7 @@ In my company QA workflow was decided to create Wrike tasks for each broken or f
 
 This repository can be used as GitHub action. Check ```.github/workflows/workflow.yml``` for example of usability.
 
-Action await on input next parameters:
+Action awaiting input of next parameter:
 - ```wrike_api_url``` - Wrike API URL. By default it's ```https://www.wrike.com/api/v4/```.
 - ```wrike_token``` - Token string to use with the Wrike API. Permanent token is ok. See details [here](https://help.wrike.com/hc/en-us/articles/210409445-Wrike-API).
 - ```wrike_root_folder_id``` - ID of the folder where the script will create subfolders for tasks and tasks themselves. Any empty folder will be fine. Note that it's a different ID from the one shown in the Wrike UI. For example: "IEAE2ESRI42RONRN". This type of folder ID can be found using the API: <https://www.wrike.com/api/v4/folders>
