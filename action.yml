@@ -1,0 +1,38 @@
+name: 'Allure-to-Wrike failures sync'
+description: 'GitHub Action to create Wrike tasks from failed or broken Allure tests'
+author: 'nickosh'
+branding:
+  icon: 'file-minus'
+  color: 'yellow'
+inputs:
+  wrike_api_url:
+    description: 'Wrike API Url'
+    required: true
+    default: 'https://www.wrike.com/api/v4/'
+  wrike_token:
+    description: 'Wrike API Token'
+    required: true
+  wrike_root_folder_id:
+    description: 'ID of the Wrike folder where the script will create subfolders and tasks'
+    required: true
+  allure_report_url:
+    description: 'URL to the Allure report to be parsed'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Set environment variables
+      shell: bash
+      run: |
+        echo "WRIKE_API_URL=${{ inputs.wrike_api_url }}" >> $GITHUB_ENV
+        echo "WRIKE_TOKEN=${{ inputs.wrike_token }}" >> $GITHUB_ENV
+        echo "WRIKE_ROOT_FOLDER_ID=${{ inputs.wrike_root_folder_id }}" >> $GITHUB_ENV
+        echo "ALLURE_REPORT_URL=${{ inputs.allure_report_url }}" >> $GITHUB_ENV
+    - name: Install Python dependencies
+      run: |
+        if [[ -f ${{github.action_path}}/requirements.txt ]]; then pip install -r ${{github.action_path}}/requirements.txt; fi
+        if [[ -f ${{github.action_path}}/src/requirements.txt ]]; then pip install -r ${{github.action_path}}/src/requirements.txt; fi
+      shell: bash
+    - name: Run Python script
+      run: python ${{github.action_path}}/src//ci_task_maker.py
+      shell: bash
