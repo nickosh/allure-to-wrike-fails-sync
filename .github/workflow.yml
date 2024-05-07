@@ -1,0 +1,19 @@
+name: Sync fails from Allure to Wrike
+on: [push]
+
+jobs:
+  allure-wrike-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.8'
+
+      - name: Run Allure to Wrike sync
+        uses: nickosh/allure-to-wrike-fails-sync@main
+        with:
+          wrike_api_url: 'https://www.wrike.com/api/v4/'
+          wrike_token: 'EXAMPLE_WRIKE_TOKEN'
+          wrike_root_folder_id: 'EXAMPLE_FOLDER_ID'
+          allure_report_url: 'https://example.github.io/allure_reports/001/'
