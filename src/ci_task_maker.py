@@ -5,6 +5,7 @@ from urllib.parse import quote
 
 import requests
 from decouple import config
+from polling2 import poll
 
 WRIKE_API_URL = config("WRIKE_API_URL", default="https://www.wrike.com/api/v4/")
 WRIKE_TOKEN = config("WRIKE_TOKEN")
@@ -14,6 +15,19 @@ WRIKE_AUTH_HEADER = {"Authorization": f"bearer {WRIKE_TOKEN}"}
 
 logger = Logger(__name__)
 logger.addHandler(StreamHandler())
+
+
+def allure_report_check(url: str) -> bool:
+    try:
+        poll(
+            lambda: requests.get(url).status_code == 200,
+            step=15,
+            timeout=300,
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Allure report URL check failed with error: {e}")
+        return False
 
 
 def get_allure_suites(allure_url: str) -> dict:
@@ -98,6 +112,8 @@ def main() -> None:
     allure_url: str = args.allure_report_url
     if not allure_url:
         raise EnvironmentError("Allure report url not provided!")
+    if not allure_report_check(allure_url):
+        raise EnvironmentError("Allure report url not accessible!")
 
     wrike_folders = get_wrike_folders()
     failed_tests = find_failed_tests(get_allure_suites(allure_url))
