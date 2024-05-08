@@ -113,7 +113,7 @@ def main() -> None:
     if not allure_url:
         raise EnvironmentError("Allure report url not provided!")
     if not allure_report_check(allure_url):
-        raise EnvironmentError("Allure report url not accessible!")
+        raise ConnectionError("Allure report url not accessible!")
 
     wrike_folders = get_wrike_folders()
     failed_tests = find_failed_tests(get_allure_suites(allure_url))
