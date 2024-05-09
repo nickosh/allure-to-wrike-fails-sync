@@ -5,7 +5,7 @@ from urllib.parse import quote
 
 import requests
 from decouple import config
-from polling2 import poll
+from polling2 import TimeoutException, poll_decorator
 
 WRIKE_API_URL = config("WRIKE_API_URL", default="https://www.wrike.com/api/v4/")
 WRIKE_TOKEN = config("WRIKE_TOKEN")
@@ -18,15 +18,22 @@ logger.addHandler(StreamHandler())
 
 
 def allure_report_check(url: str) -> bool:
+    @poll_decorator(
+        step=15,
+        timeout=300,
+        check_success=lambda status_code: status_code not in range(400, 512),
+    )
+    def url_request(url: str):
+        req = requests.get(url)
+        status_code = req.status_code
+        logger.info(f"[Check Allure report URL] Status code: {status_code}")
+        return status_code
+
     try:
-        poll(
-            lambda: requests.get(url).status_code == 200,
-            step=15,
-            timeout=300,
-        )
+        url_request(url)
         return True
-    except Exception as e:
-        logger.error(f"Allure report URL check failed with error: {e}")
+    except TimeoutException as e:
+        logger.error(f"Allure report URL check failed by timeout: {e}")
         return False
 
 
@@ -114,6 +121,7 @@ def main() -> None:
         raise EnvironmentError("Allure report url not provided!")
     if not allure_report_check(allure_url):
         raise ConnectionError("Allure report url not accessible!")
+    logger.info(f"Allure report URL is valid and accessible: {allure_url}")
 
     wrike_folders = get_wrike_folders()
     failed_tests = find_failed_tests(get_allure_suites(allure_url))
@@ -137,7 +145,7 @@ def main() -> None:
 """
             assert create_wrike_task(folder_id, test_clean_name, quote(test_desc))
         else:
-            logger.info(f"Task for '{test_clean_name}' already exist. Skipped.")
+            logger.debug(f"Task for '{test_clean_name}' already exist. Skipped.")
 
 
 if __name__ == "__main__":
