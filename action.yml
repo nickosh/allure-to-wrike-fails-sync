@@ -18,6 +18,14 @@ inputs:
   allure_report_url:
     description: 'URL to the Allure report to be parsed'
     required: true
+  allure_report_url_poll_timeout:
+    description: 'Timeout (sec) for check if Allure report URL is alive'
+    required: true
+    default: 300
+  allure_report_url_poll_step:
+    description: 'Step between checking (sec) if Allure report URL is alive'
+    required: true
+    default: 30
 runs:
   using: 'composite'
   steps:
@@ -27,6 +35,8 @@ runs:
         echo "WRIKE_API_URL=${{ inputs.wrike_api_url }}" >> $GITHUB_ENV
         echo "WRIKE_TOKEN=${{ inputs.wrike_token }}" >> $GITHUB_ENV
         echo "WRIKE_ROOT_FOLDER_ID=${{ inputs.wrike_root_folder_id }}" >> $GITHUB_ENV
+        echo "ALLURE_REPORT_URL_POLL_TIMEOUT=${{ inputs.allure_report_url_poll_timeout }}" >> $GITHUB_ENV
+        echo "ALLURE_REPORT_URL_POLL_STEP=${{ inputs.allure_report_url_poll_step }}" >> $GITHUB_ENV
     - name: Install Python dependencies
       run: |
         if [[ -f ${{github.action_path}}/requirements.txt ]]; then pip install -r ${{github.action_path}}/requirements.txt; fi

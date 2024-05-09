@@ -10,6 +10,13 @@ from polling2 import TimeoutException, poll_decorator
 WRIKE_API_URL = config("WRIKE_API_URL", default="https://www.wrike.com/api/v4/")
 WRIKE_TOKEN = config("WRIKE_TOKEN")
 WRIKE_ROOT_FOLDER_ID = config("WRIKE_ROOT_FOLDER_ID")
+ALLURE_REPORT_URL_CHECK_TIMEOUT = config(
+    "ALLURE_REPORT_URL_POLL_TIMEOUT", cast=int, default=300
+)
+ALLURE_REPORT_URL_CHECK_STEP = config(
+    "ALLURE_REPORT_URL_POLL_STEP", cast=int, default=30
+)
+URL_VALID_STATUS_CODES = [200, 202, 304]
 
 WRIKE_AUTH_HEADER = {"Authorization": f"bearer {WRIKE_TOKEN}"}
 
@@ -19,9 +26,9 @@ logger.addHandler(StreamHandler())
 
 def allure_report_check(url: str) -> bool:
     @poll_decorator(
-        step=15,
-        timeout=300,
-        check_success=lambda status_code: status_code not in range(400, 512),
+        step=ALLURE_REPORT_URL_CHECK_STEP,
+        timeout=ALLURE_REPORT_URL_CHECK_TIMEOUT,
+        check_success=lambda status_code: status_code in URL_VALID_STATUS_CODES,
     )
     def url_request(url: str):
         req = requests.get(url)
@@ -30,8 +37,8 @@ def allure_report_check(url: str) -> bool:
         return status_code
 
     try:
-        url_request(url)
-        return True
+        status_code = url_request(url)
+        return status_code in URL_VALID_STATUS_CODES
     except TimeoutException as e:
         logger.error(f"Allure report URL check failed by timeout: {e}")
         return False
