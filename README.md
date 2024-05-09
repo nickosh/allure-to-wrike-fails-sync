@@ -33,6 +33,10 @@ Action awaiting input of next parameter:
 - ```wrike_root_folder_id``` - ID of the folder where the script will create subfolders for tasks and tasks themselves. Any empty folder will be fine. Note that it's a different ID from the one shown in the Wrike UI. For example: "IEAE2ESRI42RONRN". This type of folder ID can be found using the API: <https://www.wrike.com/api/v4/folders>
 - ```allure_report_url``` - String with Allure Report URL that Python script will accept as input. Allure report must be published and should be accessible by URL to script. Script can only parse one report per run in current implementation, but can be run multiple times with different inputs.
 
+The Python script can also be run manually. You need Python >= 3.8 and to install the script dependencies from ```src/requirements.txt```.<br>
+In case of manual execution, please provide environment variables, see ```src/.env.example```.<br>
+Example script execution command: ```python3 src/ci_task_maker.py https://example.github.io/allure_reports/001/```
+
 <!-- License -->
 :scroll: License
 ---------------
