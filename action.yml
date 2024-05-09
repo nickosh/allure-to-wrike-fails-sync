@@ -33,5 +33,5 @@ runs:
         if [[ -f ${{github.action_path}}/src/requirements.txt ]]; then pip install -r ${{github.action_path}}/src/requirements.txt; fi
       shell: bash
     - name: Run Python script
-      run: python ${{github.action_path}}/src/ci_task_maker.py ${{ inputs.allure_report_url }}
+      run: python3 ${{github.action_path}}/src/ci_task_maker.py ${{ inputs.allure_report_url }}
       shell: bash
